@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한국어 Learn Korean</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:#0d1117;color:#e6edf3;min-height:100vh}
+:root{--bg:#0d1117;--s1:#161b22;--s2:#21262d;--border:#30363d;--acc:#e85d04;--acc2:#f48c06;--text:#e6edf3;--muted:#8b949e;--ok:#3fb950;--bad:#f85149;--blue:#58a6ff}
+
+.app{max-width:860px;margin:0 auto;padding:20px 14px 60px}
+.header{text-align:center;margin-bottom:24px}
+.header h1{font-family:'DM Serif Display',serif;font-size:2.2rem;color:#fff}
+.header h1 span{color:var(--acc)}
+.header p{color:var(--muted);margin-top:4px;font-size:0.85rem}
+
+.level-bar{display:flex;gap:8px;justify-content:center;margin-bottom:22px}
+.lvl-btn{padding:7px 20px;border:1px solid var(--border);border-radius:20px;background:var(--s1);color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.82rem;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.lvl-btn.active{color:#fff;border-color:transparent}
+.lvl-btn.b.active{background:#1a4d2e;border-color:#3fb950;color:#3fb950}
+.lvl-btn.i.active{background:#1a3a5c;border-color:#58a6ff;color:#58a6ff}
+.lvl-btn.e.active{background:#4a1200;border-color:#e85d04;color:#e85d04}
+.lvl-dot{width:8px;height:8px;border-radius:50%}
+.lvl-btn.b .lvl-dot{background:#3fb950}
+.lvl-btn.i .lvl-dot{background:#58a6ff}
+.lvl-btn.e .lvl-dot{background:#e85d04}
+
+.tabs{display:flex;gap:4px;background:var(--s1);border-radius:12px;padding:4px;margin-bottom:24px;border:1px solid var(--border)}
+.tab{flex:1;padding:9px 4px;border:none;background:transparent;color:var(--muted);border-radius:9px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.78rem;font-weight:500;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tab .icon{font-size:1rem}
+.tab.active{background:var(--acc);color:#fff}
+.tab:not(.active):hover{background:var(--s2);color:var(--text)}
+
+.section-title{font-size:0.72rem;font-weight:500;color:var(--acc);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.hangul-intro{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:18px;font-size:0.85rem;color:var(--muted);line-height:1.7}
+.hangul-intro strong{color:var(--text)}
+.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px;margin-bottom:22px}
+.char-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.2s}
+.char-card:hover,.char-card.sel{border-color:var(--acc);background:var(--s2)}
+.char-card .kk{font-size:1.9rem;color:#fff;display:block;line-height:1}
+.char-card .rr{font-size:0.68rem;color:var(--muted);margin-top:5px;display:block}
+.char-card .nm{font-size:0.62rem;color:var(--acc2);margin-top:1px;display:block}
+.char-detail{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-top:4px;display:none}
+.char-detail.vis{display:block}
+.big-char{font-size:3.5rem;color:#fff;text-align:center;display:block;margin-bottom:12px}
+.cd-row{display:flex;gap:16px;flex-wrap:wrap}
+.cd-info{flex:1;min-width:130px}
+.cd-info label{font-size:0.68rem;color:var(--muted);display:block;margin-bottom:3px}
+.cd-info p{font-size:0.88rem;color:var(--text)}
+.ex-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.ex-word{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:0.82rem}
+.ex-word .kr{color:#fff;display:block}
+.ex-word .en{color:var(--muted);font-size:0.72rem}
+
+.grammar-grid{display:grid;gap:12px}
+.g-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all 0.2s}
+.g-card:hover{border-color:var(--acc)}
+.g-card h3{font-size:1rem;color:#fff;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.g-card h3 .badge{font-size:0.65rem;padding:2px 8px;border-radius:10px;font-weight:500}
+.badge-b{background:#1a4d2e;color:#3fb950}
+.badge-i{background:#1a3a5c;color:#58a6ff}
+.badge-e{background:#4a1200;color:#e85d04}
+.g-card p{font-size:0.83rem;color:var(--muted);line-height:1.6}
+.g-card .example-box{background:var(--s2);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:0.85rem;display:none}
+.g-card.open .example-box{display:block}
+.example-box .kr-ex{color:#fff;font-size:1rem;margin-bottom:4px}
+.example-box .rom-ex{color:var(--acc2);font-size:0.78rem;margin-bottom:2px}
+.example-box .en-ex{color:var(--muted);font-size:0.78rem}
+
+.deck-scroll{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.deck-btn{padding:6px 13px;border:1px solid var(--border);border-radius:8px;background:var(--s1);color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.78rem;transition:all 0.2s;white-space:nowrap}
+.deck-btn.active,.deck-btn:hover{border-color:var(--acc);color:var(--text);background:var(--s2)}
+.fc-wrap{perspective:1000px;height:210px;margin-bottom:18px;cursor:pointer}
+.flashcard{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 0.5s}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--border)}
+.fc-front{background:linear-gradient(135deg,#1a0a00,#2d1200);border-color:#5a2b00}
+.fc-back{background:var(--s2);transform:rotateY(180deg)}
+.fc-label{font-size:0.68rem;color:var(--muted);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase}
+.fc-kr{font-size:2.6rem;color:#fff;font-weight:700}
+.fc-ro{font-size:1rem;color:var(--acc2);margin-top:6px}
+.fc-en{font-size:1.2rem;color:var(--text);font-weight:500}
+.fc-ex{font-size:0.78rem;color:var(--muted);margin-top:8px;text-align:center;padding:0 18px}
+.fc-hint{font-size:0.7rem;color:var(--muted);margin-top:10px;opacity:0.5}
+.card-ctrl{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-ctrl button{padding:9px 18px;border:1px solid var(--border);border-radius:8px;background:var(--s1);color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.82rem;transition:all 0.2s}
+.card-ctrl button:hover{background:var(--s2);border-color:var(--acc)}
+.ctr{color:var(--muted);font-size:0.82rem}
+.known-btns{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.kbtn{padding:7px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.8rem;font-weight:500;transition:opacity 0.2s}
+.kbtn.yes{background:var(--ok);color:#fff}
+.kbtn.no{background:var(--bad);color:#fff}
+.kbtn:hover{opacity:0.85}
+.progress-mini{height:3px;background:var(--s2);border-radius:2px;margin-bottom:14px}
+.progress-mini-fill{height:100%;background:var(--acc);border-radius:2px;transition:width 0.3s}
+
+.quiz-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.score-badge{background:var(--s1);border:1px solid var(--border);padding:5px 13px;border-radius:20px;font-size:0.8rem;color:var(--muted)}
+.score-badge span{color:var(--ok);font-weight:500}
+.pbar{height:4px;background:var(--s2);border-radius:2px;margin-bottom:22px}
+.pfill{height:100%;border-radius:2px;background:var(--acc);transition:width 0.3s}
+.quiz-q{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;margin-bottom:18px}
+.q-type{font-size:0.68rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.q-word{font-size:2.5rem;color:#fff;font-weight:700}
+.q-sub{font-size:0.82rem;color:var(--muted);margin-top:4px}
+.quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.qopt{padding:13px;border:1px solid var(--border);border-radius:10px;background:var(--s1);color:var(--text);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.88rem;transition:all 0.2s;text-align:center}
+.qopt:hover:not(:disabled){border-color:var(--acc);background:var(--s2)}
+.qopt.correct{border-color:var(--ok)!important;background:#0d2818!important;color:var(--ok)}
+.qopt.wrong{border-color:var(--bad)!important;background:#2d0e0e!important;color:var(--bad)}
+.qopt:disabled{cursor:default}
+.q-fb{text-align:center;font-size:0.85rem;margin-bottom:10px;min-height:20px}
+.fb-ok{color:var(--ok)}
+.fb-no{color:var(--bad)}
+.btn-next{width:100%;padding:11px;background:var(--acc);color:#fff;border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:0.88rem;font-weight:500;cursor:pointer;transition:opacity 0.2s}
+.btn-next:hover{opacity:0.88}
+.btn-next:disabled{opacity:0.4;cursor:default}
+.quiz-result{text-align:center;padding:36px 20px}
+.res-emoji{font-size:3rem;margin-bottom:14px;display:block}
+.res-score{font-size:2rem;font-weight:700;color:#fff;margin-bottom:6px}
+.res-msg{color:var(--muted);margin-bottom:22px}
+.btn-restart{padding:11px 26px;background:var(--acc);color:#fff;border:none;border-radius:10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.88rem;font-weight:500}
+
+.chat-wrap{display:flex;flex-direction:column;height:480px;background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.chat-msgs::-webkit-scrollbar{width:3px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.msg{max-width:82%;padding:11px 15px;border-radius:12px;font-size:0.86rem;line-height:1.6}
+.msg.bot{background:var(--s2);color:var(--text);align-self:flex-start;border:1px solid var(--border)}
+.msg.user{background:var(--acc);color:#fff;align-self:flex-end}
+.msg.typing{color:var(--muted);font-style:italic}
+.quick-row{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px 0;border-top:1px solid var(--border)}
+.qbtn{padding:4px 9px;background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;font-size:0.72rem;font-family:'Noto Sans KR',sans-serif;transition:all 0.2s;white-space:nowrap}
+.qbtn:hover{border-color:var(--acc);color:var(--text)}
+.chat-inp-row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}
+.chat-inp{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:9px 13px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.2s}
+.chat-inp:focus{border-color:var(--acc)}
+.chat-send{padding:9px 15px;background:var(--acc);border:none;border-radius:10px;color:#fff;cursor:pointer;font-size:0.82rem;transition:opacity 0.2s}
+.chat-send:hover:not(:disabled){opacity:0.85}
+.chat-send:disabled{opacity:0.5;cursor:default}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>한국어 <span>Learn Korean</span></h1>
+    <p>Your free personal Korean learning app</p>
+  </div>
+
+  <div class="level-bar">
+    <button class="lvl-btn b active" onclick="setLevel('beginner')"><span class="lvl-dot"></span>Beginner</button>
+    <button class="lvl-btn i" onclick="setLevel('intermediate')"><span class="lvl-dot"></span>Intermediate</button>
+    <button class="lvl-btn e" onclick="setLevel('expert')"><span class="lvl-dot"></span>Expert</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('hangul')"><span class="icon">🔤</span>Hangul</button>
+    <button class="tab" onclick="showTab('vocab')"><span class="icon">🃏</span>Flashcards</button>
+    <button class="tab" onclick="showTab('grammar')"><span class="icon">📖</span>Grammar</button>
+    <button class="tab" onclick="showTab('quiz')"><span class="icon">🎯</span>Quiz</button>
+    <button class="tab" onclick="showTab('chat')"><span class="icon">💬</span>AI Tutor</button>
+  </div>
+
+  <div id="tab-hangul">
+    <div class="hangul-intro">
+      <strong>Hangul · 한글</strong> — Korean's alphabet, invented in 1443. <strong>14 consonants</strong> + <strong>10 vowels</strong> combine into syllable blocks. You can learn to read it in a few hours! Click any character to explore it.
+    </div>
+    <p class="section-title">Consonants · 자음</p>
+    <div class="char-grid" id="con-grid"></div>
+    <p class="section-title">Double Consonants · 쌍자음</p>
+    <div class="char-grid" id="dcon-grid"></div>
+    <p class="section-title">Vowels · 모음</p>
+    <div class="char-grid" id="vow-grid"></div>
+    <p class="section-title">Compound Vowels · 이중모음</p>
+    <div class="char-grid" id="cvow-grid"></div>
+    <div class="char-detail" id="char-detail">
+      <span class="big-char" id="d-char"></span>
+      <div class="cd-row">
+        <div class="cd-info"><label>Romanization</label><p id="d-rom"></p></div>
+        <div class="cd-info"><label>Pronunciation tip</label><p id="d-tip"></p></div>
+        <div class="cd-info"><label>Type</label><p id="d-type"></p></div>
+      </div>
+      <div class="ex-list" id="d-ex"></div>
+    </div>
+  </div>
+
+  <div id="tab-vocab" style="display:none">
+    <p class="section-title">Deck · <span id="level-label">Beginner</span></p>
+    <div class="deck-scroll" id="deck-btns"></div>
+    <div class="progress-mini"><div class="progress-mini-fill" id="fc-prog"></div></div>
+    <div class="fc-wrap" onclick="flipCard()">
+      <div class="flashcard" id="flashcard">
+        <div class="fc-face fc-front">
+          <span class="fc-label">Korean</span>
+          <span class="fc-kr" id="fc-kr">안녕하세요</span>
+          <span class="fc-ro" id="fc-ro">annyeonghaseyo</span>
+          <span class="fc-hint">Tap to reveal</span>
+        </div>
+        <div class="fc-face fc-back">
+          <span class="fc-label">English</span>
+          <span class="fc-en" id="fc-en">Hello</span>
+          <span class="fc-ex" id="fc-ex"></span>
+        </div>
+      </div>
+    </div>
+    <div class="card-ctrl">
+      <button onclick="prevCard()">← Prev</button>
+      <span class="ctr" id="fc-ctr">1 / 1</span>
+      <button onclick="nextCard()">Next →</button>
+    </div>
+    <div class="known-btns">
+      <button class="kbtn no" onclick="markCard(false)">Still learning</button>
+      <button class="kbtn yes" onclick="markCard(true)">Got it ✓</button>
+    </div>
+  </div>
+
+  <div id="tab-grammar" style="display:none">
+    <p class="section-title">Grammar · <span id="grammar-level-label">Beginner</span></p>
+    <div class="grammar-grid" id="grammar-grid"></div>
+  </div>
+
+  <div id="tab-quiz" style="display:none">
+    <div id="quiz-game">
+      <div class="quiz-hd">
+        <span class="section-title" style="margin:0">Quiz · <span id="quiz-lvl-label">Beginner</span></span>
+        <div class="score-badge">Score: <span id="qscore">0</span>/<span id="qtotal">0</span></div>
+      </div>
+      <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+      <div class="quiz-q">
+        <div class="q-type" id="q-type">What does this mean?</div>
+        <div class="q-word" id="q-word">안녕하세요</div>
+        <div class="q-sub" id="q-sub"></div>
+      </div>
+      <div class="quiz-opts" id="quiz-opts"></div>
+      <div class="q-fb" id="q-fb"></div>
+      <button class="btn-next" id="btn-next" disabled onclick="nextQ()">Next →</button>
+    </div>
+    <div class="quiz-result" id="quiz-result" style="display:none">
+      <span class="res-emoji" id="res-emoji">🎉</span>
+      <div class="res-score" id="res-score"></div>
+      <div class="res-msg" id="res-msg"></div>
+      <button class="btn-restart" onclick="startQuiz()">Try again</button>
+    </div>
+  </div>
+
+  <div id="tab-chat" style="display:none">
+    <div class="chat-wrap">
+      <div class="quick-row">
+        <button class="qbtn" onclick="sendQ('Teach me a basic greeting in Korean')">Greetings</button>
+        <button class="qbtn" onclick="sendQ('How do I count 1-10 in Korean?')">Numbers</button>
+        <button class="qbtn" onclick="sendQ('Explain the difference between formal and informal speech in Korean')">Formality</button>
+        <button class="qbtn" onclick="sendQ('Teach me how to introduce myself in Korean')">Introduce myself</button>
+        <button class="qbtn" onclick="sendQ('What are the most common Korean grammar patterns I should learn first?')">Grammar tips</button>
+        <button class="qbtn" onclick="sendQ('Give me 5 common Korean phrases for everyday use')">Daily phrases</button>
+      </div>
+      <div class="chat-msgs" id="chat-msgs">
+        <div class="msg bot">안녕하세요! I'm your Korean tutor 🇰🇷 Ask me anything — vocabulary, grammar, pronunciation, or just practice chatting. What would you like to learn?</div>
+      </div>
+      <div class="chat-inp-row">
+        <input class="chat-inp" id="chat-inp" type="text" placeholder="Ask anything about Korean..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="chat-send" id="chat-send" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const consonants=[
+  {k:'ㄱ',r:'g/k',name:'giyeok',tip:'Like "g" at start, "k" at end of syllable',ex:[{kr:'가방',en:'bag'},{kr:'국',en:'soup'}]},
+  {k:'ㄴ',r:'n',name:'nieun',tip:'Like English "n"',ex:[{kr:'나무',en:'tree'},{kr:'눈',en:'snow/eye'}]},
+  {k:'ㄷ',r:'d/t',name:'digeut',tip:'Like "d" at start, "t" at end',ex:[{kr:'다리',en:'bridge'},{kr:'달',en:'moon'}]},
+  {k:'ㄹ',r:'r/l',name:'rieul',tip:'Between "r" and "l" — tongue flap',ex:[{kr:'라면',en:'ramen'},{kr:'달',en:'moon'}]},
+  {k:'ㅁ',r:'m',name:'mieum',tip:'Like English "m"',ex:[{kr:'마음',en:'heart'},{kr:'물',en:'water'}]},
+  {k:'ㅂ',r:'b/p',name:'bieup',tip:'Like "b" at start, "p" at end',ex:[{kr:'바다',en:'sea'},{kr:'밥',en:'rice/meal'}]},
+  {k:'ㅅ',r:'s',name:'siot',tip:'Like "s", or "sh" before i/y',ex:[{kr:'사람',en:'person'},{kr:'손',en:'hand'}]},
+  {k:'ㅇ',r:'-/ng',name:'ieung',tip:'Silent at start of syllable, "ng" at end',ex:[{kr:'아버지',en:'father'},{kr:'강',en:'river'}]},
+  {k:'ㅈ',r:'j',name:'jieut',tip:'Like "j" in jump',ex:[{kr:'자다',en:'to sleep'},{kr:'집',en:'house'}]},
+  {k:'ㅊ',r:'ch',name:'chieut',tip:'Like "ch" in chair (aspirated)',ex:[{kr:'차',en:'tea/car'},{kr:'친구',en:'friend'}]},
+  {k:'ㅋ',r:'k',name:'kieuk',tip:'Aspirated "k" with puff of air',ex:[{kr:'커피',en:'coffee'},{kr:'코',en:'nose'}]},
+  {k:'ㅌ',r:'t',name:'tieut',tip:'Aspirated "t" with puff of air',ex:[{kr:'토마토',en:'tomato'},{kr:'티',en:'tea (loanword)'}]},
+  {k:'ㅍ',r:'p',name:'pieup',tip:'Aspirated "p" with puff of air',ex:[{kr:'피자',en:'pizza'},{kr:'편의점',en:'convenience store'}]},
+  {k:'ㅎ',r:'h',name:'hieut',tip:'Like English "h"',ex:[{kr:'하늘',en:'sky'},{kr:'학교',en:'school'}]},
+];
+const doubleConsonants=[
+  {k:'ㄲ',r:'kk',name:'ssang-giyeok',tip:'Tense "k" — no air release, throat tension',ex:[{kr:'까다',en:'to peel'},{kr:'꽃',en:'flower'}]},
+  {k:'ㄸ',r:'tt',name:'ssang-digeut',tip:'Tense "t" — like holding your breath',ex:[{kr:'따다',en:'to pick'},{kr:'딸',en:'daughter'}]},
+  {k:'ㅃ',r:'pp',name:'ssang-bieup',tip:'Tense "p" — sounds stronger than ㅂ',ex:[{kr:'빠르다',en:'fast'},{kr:'빵',en:'bread'}]},
+  {k:'ㅆ',r:'ss',name:'ssang-siot',tip:'Tense "s" — sharper and stronger',ex:[{kr:'씨',en:'seed/Mr./Ms.'},{kr:'쓰다',en:'to write/use'}]},
+  {k:'ㅉ',r:'jj',name:'ssang-jieut',tip:'Tense "j" — stronger and more pressed',ex:[{kr:'짜다',en:'salty'},{kr:'찌다',en:'to steam'}]},
+];
+const vowels=[
+  {k:'ㅏ',r:'a',name:'a',tip:'Like "a" in father',ex:[{kr:'아빠',en:'dad'},{kr:'사랑',en:'love'}]},
+  {k:'ㅑ',r:'ya',name:'ya',tip:'Like "ya" in yard',ex:[{kr:'야구',en:'baseball'},{kr:'야채',en:'vegetables'}]},
+  {k:'ㅓ',r:'eo',name:'eo',tip:'Like British "o" in "on" or "uh"',ex:[{kr:'어머니',en:'mother'},{kr:'언제',en:'when'}]},
+  {k:'ㅕ',r:'yeo',name:'yeo',tip:'Like "yuh"',ex:[{kr:'여자',en:'woman'},{kr:'여기',en:'here'}]},
+  {k:'ㅗ',r:'o',name:'o',tip:'Like "o" in go but shorter and rounder',ex:[{kr:'오빠',en:'older brother'},{kr:'고양이',en:'cat'}]},
+  {k:'ㅛ',r:'yo',name:'yo',tip:'Like "yo"',ex:[{kr:'요리',en:'cooking'},{kr:'교실',en:'classroom'}]},
+  {k:'ㅜ',r:'u',name:'u',tip:'Like "oo" in moon',ex:[{kr:'우유',en:'milk'},{kr:'구름',en:'cloud'}]},
+  {k:'ㅠ',r:'yu',name:'yu',tip:'Like "you"',ex:[{kr:'유리',en:'glass'},{kr:'휴가',en:'vacation'}]},
+  {k:'ㅡ',r:'eu',name:'eu',tip:'Like "uh" with lips spread flat, unique to Korean',ex:[{kr:'크다',en:'to be big'},{kr:'으악',en:'Argh!'}]},
+  {k:'ㅣ',r:'i',name:'i',tip:'Like "ee" in see',ex:[{kr:'이름',en:'name'},{kr:'시간',en:'time'}]},
+];
+const compoundVowels=[
+  {k:'ㅐ',r:'ae',name:'ae',tip:'Like "e" in bed',ex:[{kr:'개',en:'dog'},{kr:'새',en:'bird'}]},
+  {k:'ㅒ',r:'yae',name:'yae',tip:'Like "ye" — rarely used',ex:[{kr:'예쁘다',en:'pretty'},{kr:'얘기',en:'story'}]},
+  {k:'ㅔ',r:'e',name:'e',tip:'Like "e" in bed (same as ㅐ in modern Korean)',ex:[{kr:'세계',en:'world'},{kr:'네',en:'yes'}]},
+  {k:'ㅖ',r:'ye',name:'ye',tip:'Like "ye" in yes',ex:[{kr:'예',en:'yes (formal)'},{kr:'계획',en:'plan'}]},
+  {k:'ㅘ',r:'wa',name:'wa',tip:'Like "wa"',ex:[{kr:'와!',en:'Wow!'},{kr:'과일',en:'fruit'}]},
+  {k:'ㅙ',r:'wae',name:'wae',tip:'Like "we"',ex:[{kr:'왜',en:'why'},{kr:'돼지',en:'pig'}]},
+  {k:'ㅚ',r:'oe',name:'oe',tip:'Like "we" (same as ㅙ)',ex:[{kr:'외국인',en:'foreigner'},{kr:'최고',en:'the best'}]},
+  {k:'ㅝ',r:'wo',name:'wo',tip:'Like "wuh"',ex:[{kr:'뭐',en:'what'},{kr:'원',en:'Korean won'}]},
+  {k:'ㅞ',r:'we',name:'we',tip:'Like "we"',ex:[{kr:'웨이터',en:'waiter'},{kr:'웬일',en:'what a surprise'}]},
+  {k:'ㅟ',r:'wi',name:'wi',tip:'Like "wee"',ex:[{kr:'위',en:'above/stomach'},{kr:'귀',en:'ear'}]},
+  {k:'ㅢ',r:'ui',name:'ui',tip:'Slide from ㅡ to ㅣ quickly',ex:[{kr:'의사',en:'doctor'},{kr:'의자',en:'chair'}]},
+];
+
+const allDecks={
+  beginner:{
+    'Greetings':[
+      {kr:'안녕하세요',r:'annyeonghaseyo',en:'Hello (formal)',ex:'Used with strangers, elders, or in formal settings'},
+      {kr:'안녕',r:'annyeong',en:'Hi / Bye (casual)',ex:'Used with close friends of similar age'},
+      {kr:'안녕히 가세요',r:'annyeonghi gaseyo',en:'Goodbye (you\'re leaving)',ex:'Said to someone who is staying'},
+      {kr:'안녕히 계세요',r:'annyeonghi gyeseyo',en:'Goodbye (I\'m leaving)',ex:'Said when you are the one leaving'},
+      {kr:'감사합니다',r:'gamsahamnida',en:'Thank you (formal)',ex:'Used in formal situations'},
+      {kr:'고마워요',r:'gomawoyo',en:'Thank you (casual)',ex:'Used with friends or in casual settings'},
+      {kr:'죄송합니다',r:'joesonghamnida',en:'I\'m sorry (formal)',ex:'For sincere or serious apologies'},
+      {kr:'미안해요',r:'mianhaeyo',en:'I\'m sorry (casual)',ex:'For light apologies with friends'},
+      {kr:'괜찮아요',r:'gwaenchanayo',en:'It\'s okay / I\'m fine',ex:'A: 미안해요! B: 괜찮아요!'},
+      {kr:'반갑습니다',r:'bangapseumnida',en:'Nice to meet you',ex:'Said when meeting someone for the first time'},
+      {kr:'네',r:'ne',en:'Yes',ex:'네, 감사합니다 — Yes, thank you.'},
+      {kr:'아니요',r:'aniyo',en:'No',ex:'아니요, 괜찮아요 — No, it\'s okay.'},
+      {kr:'잘 지냈어요?',r:'jal jinaesseoyo?',en:'How have you been?',ex:'Asked to someone you haven\'t seen in a while'},
+      {kr:'처음 뵙겠습니다',r:'cheoeum boepgessseumnida',en:'How do you do? (first meeting)',ex:'Very formal first meeting greeting'},
+    ],
+    'Numbers':[
+      {kr:'하나',r:'hana',en:'One (native Korean)',ex:'Used for counting objects'},
+      {kr:'둘',r:'dul',en:'Two (native Korean)',ex:'사람 둘 — two people'},
+      {kr:'셋',r:'set',en:'Three (native Korean)',ex:'세 시 = 3 o\'clock'},
+      {kr:'넷',r:'net',en:'Four (native Korean)',ex:'네 개 = four items'},
+      {kr:'다섯',r:'daseot',en:'Five (native Korean)',ex:'다섯 살 = 5 years old'},
+      {kr:'여섯',r:'yeoseot',en:'Six (native Korean)',ex:'여섯 시 = 6 o\'clock'},
+      {kr:'일곱',r:'ilgop',en:'Seven (native Korean)',ex:'일곱 명 = 7 people'},
+      {kr:'여덟',r:'yeodeol',en:'Eight (native Korean)',ex:'여덟 개 = 8 items'},
+      {kr:'아홉',r:'ahop',en:'Nine (native Korean)',ex:'아홉 살 = 9 years old'},
+      {kr:'열',r:'yeol',en:'Ten (native Korean)',ex:'열 시 = 10 o\'clock'},
+      {kr:'일',r:'il',en:'One (Sino-Korean)',ex:'Used for dates, money — 일 층 (1st floor)'},
+      {kr:'이',r:'i',en:'Two (Sino-Korean)',ex:'이월 = February'},
+      {kr:'삼',r:'sam',en:'Three (Sino-Korean)',ex:'삼월 = March'},
+      {kr:'사',r:'sa',en:'Four (Sino-Korean)',ex:'사월 = April'},
+      {kr:'오',r:'o',en:'Five (Sino-Korean)',ex:'오월 = May'},
+      {kr:'육',r:'yuk',en:'Six (Sino-Korean)',ex:'육 층 = 6th floor'},
+      {kr:'칠',r:'chil',en:'Seven (Sino-Korean)',ex:'칠월 = July'},
+      {kr:'팔',r:'pal',en:'Eight (Sino-Korean)',ex:'팔월 = August'},
+      {kr:'구',r:'gu',en:'Nine (Sino-Korean)',ex:'구월 = September'},
+      {kr:'십',r:'sip',en:'Ten (Sino-Korean)',ex:'십 원 = 10 won'},
+    ],
+    'Food & Drink':[
+      {kr:'밥',r:'bap',en:'Rice / Meal',ex:'밥 먹었어요? Have you eaten?'},
+      {kr:'물',r:'mul',en:'Water',ex:'물 주세요 — Water please.'},
+      {kr:'커피',r:'keopi',en:'Coffee',ex:'아메리카노 한 잔 주세요!'},
+      {kr:'차',r:'cha',en:'Tea',ex:'녹차 — green tea, 홍차 — black tea'},
+      {kr:'빵',r:'ppang',en:'Bread',ex:'From French "pain" — loanword'},
+      {kr:'김치',r:'kimchi',en:'Kimchi',ex:'Fermented cabbage — a Korean staple'},
+      {kr:'고기',r:'gogi',en:'Meat',ex:'소고기 = beef, 돼지고기 = pork'},
+      {kr:'생선',r:'saengseon',en:'Fish',ex:'생선구이 = grilled fish'},
+      {kr:'과일',r:'gwail',en:'Fruit',ex:'사과 = apple, 바나나 = banana'},
+      {kr:'채소',r:'chaeso',en:'Vegetables',ex:'채소를 많이 먹어요 — I eat a lot of vegetables'},
+      {kr:'라면',r:'ramyeon',en:'Instant noodles',ex:'Korea\'s most beloved comfort food'},
+      {kr:'삼겹살',r:'samgyeopsal',en:'Grilled pork belly',ex:'Famous Korean BBQ dish'},
+      {kr:'냉면',r:'naengmyeon',en:'Cold noodles',ex:'Perfect for summer!'},
+      {kr:'맛있어요',r:'masisseoyo',en:'It\'s delicious',ex:'Said after tasting good food'},
+      {kr:'맵다',r:'maepda',en:'Spicy',ex:'이거 너무 매워요 — This is too spicy'},
+    ],
+    'Colors':[
+      {kr:'빨간색',r:'ppalgansaek',en:'Red',ex:'빨간 장미 — red rose'},
+      {kr:'파란색',r:'paransaek',en:'Blue',ex:'파란 하늘 — blue sky'},
+      {kr:'노란색',r:'noransaek',en:'Yellow',ex:'노란 꽃 — yellow flower'},
+      {kr:'초록색',r:'choroksaek',en:'Green',ex:'초록 나무 — green tree'},
+      {kr:'흰색',r:'huinsaek',en:'White',ex:'흰 눈 — white snow'},
+      {kr:'검은색',r:'geomeunsaek',en:'Black',ex:'검은 고양이 — black cat'},
+      {kr:'보라색',r:'borasaek',en:'Purple',ex:'보라 꽃 — purple flower'},
+      {kr:'주황색',r:'juhwangsaek',en:'Orange',ex:'주황 하늘 — orange sky (sunset)'},
+      {kr:'분홍색',r:'bunhongsaek',en:'Pink',ex:'분홍 드레스 — pink dress'},
+      {kr:'회색',r:'hoesaek',en:'Gray',ex:'회색 구름 — gray clouds'},
+    ],
+    'Family':[
+      {kr:'가족',r:'gajok',en:'Family',ex:'저는 가족이 네 명이에요 — My family has 4 members'},
+      {kr:'아버지',r:'abeoji',en:'Father (formal)',ex:'아버지 = formal, 아빠 = casual'},
+      {kr:'아빠',r:'appa',en:'Dad (casual)',ex:'아빠, 배고파요! — Dad, I\'m hungry!'},
+      {kr:'어머니',r:'eomeoni',en:'Mother (formal)',ex:'어머니 = formal, 엄마 = casual'},
+      {kr:'엄마',r:'eomma',en:'Mom (casual)',ex:'엄마, 사랑해요! — Mom, I love you!'},
+      {kr:'형',r:'hyeong',en:'Older brother (said by male)',ex:'형! 어디 가? — Hyung, where are you going?'},
+      {kr:'오빠',r:'oppa',en:'Older brother (said by female)',ex:'Also used by women to address older male friends'},
+      {kr:'언니',r:'eonni',en:'Older sister (said by female)',ex:'언니, 같이 가요! — Unni, let\'s go together!'},
+      {kr:'누나',r:'nuna',en:'Older sister (said by male)',ex:'누나, 이거 뭐야? — Nuna, what is this?'},
+      {kr:'동생',r:'dongsaeng',en:'Younger sibling',ex:'남동생 = younger brother, 여동생 = younger sister'},
+    ],
+    'Daily Life':[
+      {kr:'집',r:'jip',en:'House / Home',ex:'집에 가요 — I\'m going home'},
+      {kr:'학교',r:'hakgyo',en:'School',ex:'학교에 가요 — I\'m going to school'},
+      {kr:'일',r:'il',en:'Work / Job',ex:'일해요 — I\'m working'},
+      {kr:'친구',r:'chingu',en:'Friend',ex:'친구랑 밥 먹었어요 — I ate with a friend'},
+      {kr:'책',r:'chaek',en:'Book',ex:'책을 읽어요 — I\'m reading a book'},
+      {kr:'핸드폰',r:'haendeupon',en:'Mobile phone',ex:'핸드폰 어디 있어요? — Where is my phone?'},
+      {kr:'컴퓨터',r:'keompyuteo',en:'Computer',ex:'컴퓨터를 써요 — I use a computer'},
+      {kr:'시간',r:'sigan',en:'Time',ex:'시간이 없어요 — I don\'t have time'},
+      {kr:'돈',r:'don',en:'Money',ex:'돈이 없어요 — I have no money'},
+      {kr:'병원',r:'byeongwon',en:'Hospital',ex:'병원에 가야 해요 — I need to go to the hospital'},
+    ],
+  },
+  intermediate:{
+    'Verbs':[
+      {kr:'가다',r:'gada',en:'To go',ex:'학교에 가요 — I go to school'},
+      {kr:'오다',r:'oda',en:'To come',ex:'집에 와요 — Come home'},
+      {kr:'먹다',r:'meokda',en:'To eat',ex:'밥을 먹어요 — I eat rice'},
+      {kr:'마시다',r:'masida',en:'To drink',ex:'물을 마셔요 — I drink water'},
+      {kr:'자다',r:'jada',en:'To sleep',ex:'일찍 자요 — I sleep early'},
+      {kr:'일어나다',r:'ireonada',en:'To wake up / get up',ex:'7시에 일어나요 — I wake up at 7'},
+      {kr:'공부하다',r:'gongbuhada',en:'To study',ex:'한국어를 공부해요 — I study Korean'},
+      {kr:'일하다',r:'ilhada',en:'To work',ex:'매일 일해요 — I work every day'},
+      {kr:'만나다',r:'mannada',en:'To meet',ex:'친구를 만나요 — I meet a friend'},
+      {kr:'사다',r:'sada',en:'To buy',ex:'옷을 사요 — I buy clothes'},
+      {kr:'팔다',r:'palda',en:'To sell',ex:'물건을 팔아요 — I sell goods'},
+      {kr:'읽다',r:'ikda',en:'To read',ex:'책을 읽어요 — I read a book'},
+      {kr:'쓰다',r:'sseuda',en:'To write / use',ex:'편지를 써요 — I write a letter'},
+      {kr:'듣다',r:'deutda',en:'To listen / hear',ex:'음악을 들어요 — I listen to music'},
+      {kr:'보다',r:'boda',en:'To see / watch',ex:'영화를 봐요 — I watch a movie'},
+      {kr:'말하다',r:'malhada',en:'To speak / say',ex:'한국어로 말해요 — I speak in Korean'},
+    ],
+    'Adjectives':[
+      {kr:'크다',r:'keuda',en:'Big / Large',ex:'집이 커요 — The house is big'},
+      {kr:'작다',r:'jakda',en:'Small',ex:'방이 작아요 — The room is small'},
+      {kr:'좋다',r:'jota',en:'Good / Nice',ex:'날씨가 좋아요 — The weather is nice'},
+      {kr:'나쁘다',r:'nappeuda',en:'Bad',ex:'기분이 나빠요 — I\'m in a bad mood'},
+      {kr:'빠르다',r:'ppareuda',en:'Fast',ex:'지하철이 빨라요 — The subway is fast'},
+      {kr:'느리다',r:'neurida',en:'Slow',ex:'버스가 느려요 — The bus is slow'},
+      {kr:'쉽다',r:'swipda',en:'Easy',ex:'한국어가 쉬워요? — Is Korean easy?'},
+      {kr:'어렵다',r:'eoryeopda',en:'Difficult',ex:'이 문제가 어려워요 — This problem is difficult'},
+      {kr:'재미있다',r:'jaemiitda',en:'Interesting / Fun',ex:'한국어가 재미있어요! — Korean is fun!'},
+      {kr:'지루하다',r:'jiruhada',en:'Boring',ex:'이 영화가 지루해요 — This movie is boring'},
+      {kr:'맛있다',r:'masitda',en:'Delicious',ex:'이 음식이 맛있어요 — This food is delicious'},
+      {kr:'예쁘다',r:'yeppeuda',en:'Pretty',ex:'꽃이 예뻐요 — The flower is pretty'},
+      {kr:'멋있다',r:'meositda',en:'Cool / Stylish',ex:'그 사람이 멋있어요 — That person is cool'},
+    ],
+    'Travel':[
+      {kr:'공항',r:'gonghang',en:'Airport',ex:'공항에 가야 해요 — I need to go to the airport'},
+      {kr:'기차',r:'gicha',en:'Train',ex:'KTX is South Korea\'s high-speed train'},
+      {kr:'버스',r:'beoseu',en:'Bus',ex:'버스를 타요 — I take the bus'},
+      {kr:'지하철',r:'jihacheol',en:'Subway',ex:'지하철이 편해요 — The subway is convenient'},
+      {kr:'택시',r:'taeksi',en:'Taxi',ex:'택시를 불러요 — I call a taxi'},
+      {kr:'호텔',r:'hotel',en:'Hotel',ex:'호텔 예약했어요? — Did you book a hotel?'},
+      {kr:'여권',r:'yeokkwon',en:'Passport',ex:'여권을 가져오세요 — Please bring your passport'},
+      {kr:'표',r:'pyo',en:'Ticket',ex:'표를 샀어요 — I bought a ticket'},
+      {kr:'어디예요?',r:'eodiyeyo?',en:'Where is it?',ex:'화장실 어디예요? — Where is the bathroom?'},
+      {kr:'얼마예요?',r:'eolmayeyo?',en:'How much is it?',ex:'이거 얼마예요? — How much is this?'},
+      {kr:'지도',r:'jido',en:'Map',ex:'지도 있어요? — Do you have a map?'},
+    ],
+    'Shopping':[
+      {kr:'가게',r:'gage',en:'Store / Shop',ex:'편의점 — convenience store'},
+      {kr:'시장',r:'sijang',en:'Market',ex:'남대문 시장 — Namdaemun Market'},
+      {kr:'할인',r:'halin',en:'Discount / Sale',ex:'할인해 주세요 — Please give me a discount'},
+      {kr:'영수증',r:'yeongsujeung',en:'Receipt',ex:'영수증 주세요 — Please give me a receipt'},
+      {kr:'카드',r:'kadeu',en:'Card (payment)',ex:'카드 돼요? — Do you accept cards?'},
+      {kr:'현금',r:'hyeongeum',en:'Cash',ex:'현금으로 낼게요 — I\'ll pay with cash'},
+      {kr:'비싸다',r:'bissada',en:'Expensive',ex:'너무 비싸요 — It\'s too expensive'},
+      {kr:'싸다',r:'ssada',en:'Cheap',ex:'이게 더 싸요 — This one is cheaper'},
+      {kr:'크기',r:'keugi',en:'Size',ex:'큰 사이즈 있어요? — Do you have a larger size?'},
+    ],
+    'Emotions':[
+      {kr:'기쁘다',r:'gippeuda',en:'Happy / Joyful',ex:'기뻐요! — I\'m so happy!'},
+      {kr:'슬프다',r:'seulpeuda',en:'Sad',ex:'슬퍼요... — I\'m sad...'},
+      {kr:'화나다',r:'hwanada',en:'Angry',ex:'화났어요 — I\'m angry'},
+      {kr:'무섭다',r:'museopda',en:'Scared / Scary',ex:'귀신이 무서워요 — I\'m scared of ghosts'},
+      {kr:'부끄럽다',r:'bukkeureupda',en:'Embarrassed / Shy',ex:'부끄러워요! — I\'m embarrassed!'},
+      {kr:'피곤하다',r:'pigonhada',en:'Tired',ex:'너무 피곤해요 — I\'m so tired'},
+      {kr:'걱정하다',r:'geokjeonghada',en:'To worry',ex:'걱정하지 마세요 — Don\'t worry'},
+      {kr:'그리워하다',r:'geuriowohada',en:'To miss (someone)',ex:'고향이 그리워요 — I miss my hometown'},
+    ],
+  },
+  expert:{
+    'Idioms':[
+      {kr:'눈이 높다',r:'nun-i nopda',en:'To have high standards',ex:'그 사람은 눈이 너무 높아요 — They have very high standards'},
+      {kr:'발이 넓다',r:'bal-i neolda',en:'To know many people (well-connected)',ex:'그 사람은 발이 넓어요 — They know a lot of people'},
+      {kr:'귀가 얇다',r:'gwi-ga yalda',en:'Easily influenced / gullible',ex:'귀가 얇아서 사기 당했어요 — Got scammed because they\'re too gullible'},
+      {kr:'입이 무겁다',r:'ib-i mugeopda',en:'Good at keeping secrets',ex:'그 친구는 입이 무거워요 — That friend is good at keeping secrets'},
+      {kr:'손이 크다',r:'son-i keuda',en:'Generous (especially with food)',ex:'우리 엄마는 손이 커요 — My mom is very generous'},
+      {kr:'배가 아프다',r:'bae-ga apeuda',en:'Jealous of others\' success',ex:'친구가 성공하니까 배가 아파요 — I\'m jealous my friend succeeded'},
+      {kr:'시간 가는 줄 모르다',r:'sigan ganeun jul moreuda',en:'Time flies (lose track of time)',ex:'게임하다 보니 시간 가는 줄 몰랐어요'},
+      {kr:'발 뻗고 자다',r:'bal ppeutgo jada',en:'To sleep peacefully (clear conscience)',ex:'이제 발 뻗고 잘 수 있어요 — Now I can sleep peacefully'},
+    ],
+    'Grammar Patterns':[
+      {kr:'-(으)ㄹ 것이다',r:'-(eu)l geosida',en:'Will / Going to (future tense)',ex:'내일 갈 거예요 — I will go tomorrow'},
+      {kr:'-아/어 보다',r:'-a/eo boda',en:'To try doing something',ex:'한번 먹어 봐요 — Try eating it once'},
+      {kr:'-고 싶다',r:'-go sipda',en:'Want to do',ex:'한국에 가고 싶어요 — I want to go to Korea'},
+      {kr:'-아/어야 하다',r:'-a/eoya hada',en:'Must / Have to',ex:'공부해야 해요 — I have to study'},
+      {kr:'-지 않다',r:'-ji anta',en:'Negative form (not)',ex:'먹지 않아요 — I don\'t eat'},
+      {kr:'-는 것 같다',r:'-neun geot gatda',en:'It seems like / I think',ex:'비가 오는 것 같아요 — It seems like it\'s raining'},
+      {kr:'-아/어서',r:'-a/eoseo',en:'Because of / So (reason)',ex:'배고파서 밥을 먹었어요 — I was hungry so I ate'},
+      {kr:'-면',r:'-myeon',en:'If / When (conditional)',ex:'시간이 있으면 오세요 — If you have time, please come'},
+    ],
+    'TOPIK Vocabulary':[
+      {kr:'경제',r:'gyeongje',en:'Economy',ex:'한국 경제가 성장했어요 — The Korean economy grew'},
+      {kr:'환경',r:'hwangyeong',en:'Environment',ex:'환경 보호가 중요해요 — Protecting the environment is important'},
+      {kr:'문화',r:'munhwa',en:'Culture',ex:'한국 문화에 관심이 있어요 — I\'m interested in Korean culture'},
+      {kr:'정치',r:'jeongchi',en:'Politics',ex:'정치에 관심이 없어요 — I\'m not interested in politics'},
+      {kr:'사회',r:'sahoe',en:'Society',ex:'다문화 사회 — multicultural society'},
+      {kr:'기술',r:'gisul',en:'Technology / Skill',ex:'첨단 기술 — advanced technology'},
+      {kr:'역사',r:'yeoksa',en:'History',ex:'한국 역사를 배우고 싶어요 — I want to learn Korean history'},
+      {kr:'인구',r:'ingu',en:'Population',ex:'한국의 인구는 약 5천만이에요 — Korea\'s population is about 50 million'},
+      {kr:'발전',r:'baljeon',en:'Development / Progress',ex:'급속한 발전 — rapid development'},
+      {kr:'국제',r:'gukje',en:'International',ex:'국제 관계 — international relations'},
+    ],
+    'Business Korean':[
+      {kr:'회의',r:'hoeui',en:'Meeting',ex:'오후에 회의가 있어요 — There\'s a meeting in the afternoon'},
+      {kr:'보고서',r:'bogoseo',en:'Report',ex:'보고서를 제출해야 해요 — I need to submit the report'},
+      {kr:'계약',r:'gyeyak',en:'Contract',ex:'계약서에 서명해 주세요 — Please sign the contract'},
+      {kr:'거래처',r:'georaeche',en:'Client / Business partner',ex:'거래처와 식사해요 — I\'m having a meal with a client'},
+      {kr:'출장',r:'chuljang',en:'Business trip',ex:'다음 주에 출장 가요 — I\'m going on a business trip next week'},
+      {kr:'수익',r:'suik',en:'Profit / Revenue',ex:'수익이 늘었어요 — Profits have increased'},
+      {kr:'마감',r:'magam',en:'Deadline',ex:'마감이 내일이에요 — The deadline is tomorrow'},
+      {kr:'프레젠테이션',r:'peurejentesyeon',en:'Presentation',ex:'발표 = shorter way to say it'},
+    ],
+    'Formal Speech':[
+      {kr:'말씀하시다',r:'malsseum-hasida',en:'To say / speak (honorific)',ex:'무슨 말씀을 하셨어요? — What did you say?'},
+      {kr:'드시다',r:'deusida',en:'To eat / drink (honorific)',ex:'많이 드세요 — Please eat a lot'},
+      {kr:'주무시다',r:'jumusida',en:'To sleep (honorific)',ex:'잘 주무셨어요? — Did you sleep well?'},
+      {kr:'계시다',r:'gyesida',en:'To exist / be (honorific)',ex:'사장님 계세요? — Is the director in?'},
+      {kr:'성함',r:'seongham',en:'Name (honorific for 이름)',ex:'성함이 어떻게 되세요? — May I ask your name?'},
+      {kr:'연세',r:'yeonse',en:'Age (honorific for 나이)',ex:'연세가 어떻게 되세요? — May I ask your age?'},
+    ],
+  },
+};
+
+const grammarLessons={
+  beginner:[
+    {title:'Subject Markers: 이/가',desc:'Added after the subject of a sentence. Use 이 after a consonant, 가 after a vowel.',level:'beginner',examples:[{kr:'저는 학생이에요',rom:'jeoneun haksaengieyo',en:'I am a student'},{kr:'친구가 와요',rom:'chinguga wayo',en:'My friend is coming'}]},
+    {title:'Topic Markers: 은/는',desc:'Mark the topic of a sentence. Use 은 after consonant, 는 after vowel.',level:'beginner',examples:[{kr:'저는 한국어를 배워요',rom:'jeoneun hangugeo-reul baewoyo',en:'I am learning Korean'},{kr:'날씨는 좋아요',rom:'nalssineun joayo',en:'The weather is nice'}]},
+    {title:'Object Markers: 을/를',desc:'Mark the object (what the action is done to). Use 을 after consonant, 를 after vowel.',level:'beginner',examples:[{kr:'밥을 먹어요',rom:'bap-eul meogeoyo',en:'I eat rice'},{kr:'책을 읽어요',rom:'chaek-eul ilgeoyo',en:'I read a book'}]},
+    {title:'Copula: 이에요/예요',desc:'Means "to be" (is/am/are). Use 이에요 after consonant, 예요 after vowel.',level:'beginner',examples:[{kr:'저는 학생이에요',rom:'jeoneun haksaengieyo',en:'I am a student'},{kr:'이건 책이에요',rom:'igeon chaegieyo',en:'This is a book'}]},
+    {title:'Polite present tense: -아/어요',desc:'The basic polite verb ending. Drop the 다, check the last vowel, and add 아요 or 어요.',level:'beginner',examples:[{kr:'가요',rom:'gayo',en:'(I/you/they) go'},{kr:'먹어요',rom:'meogeoyo',en:'(I/you/they) eat'}]},
+    {title:'Location Markers: 에/에서',desc:'에 marks destination or location of existence. 에서 marks where an action takes place.',level:'beginner',examples:[{kr:'학교에 가요',rom:'hakgyoe gayo',en:'I go to school'},{kr:'학교에서 공부해요',rom:'hakgyoeseo gongbuhaeyo',en:'I study at school'}]},
+  ],
+  intermediate:[
+    {title:'Past tense: -았/었어요',desc:'Add 았어요 (after ㅏ/ㅗ vowel) or 었어요 (all others) to make the past tense.',level:'intermediate',examples:[{kr:'밥을 먹었어요',rom:'bab-eul meogeotseoyo',en:'I ate rice'},{kr:'학교에 갔어요',rom:'hakgyoe gasseyo',en:'I went to school'}]},
+    {title:'Future tense: -(으)ㄹ 거예요',desc:'Expresses plans or predictions. Add ㄹ 거예요 after vowel stems, 을 거예요 after consonant stems.',level:'intermediate',examples:[{kr:'내일 갈 거예요',rom:'naeil gal geoyeyo',en:'I will go tomorrow'},{kr:'비가 올 거예요',rom:'biga ol geoyeyo',en:'It will rain'}]},
+    {title:'Negative: -지 않아요 / 안-',desc:'Two ways to negate: place 안 before the verb, or add -지 않아요 after the stem.',level:'intermediate',examples:[{kr:'안 먹어요',rom:'an meogeoyo',en:'I don\'t eat'},{kr:'먹지 않아요',rom:'meokji anhayo',en:'I don\'t eat (more formal)'}]},
+    {title:'Desire: -고 싶어요',desc:'Attach 고 싶어요 to a verb stem to express "I want to..."',level:'intermediate',examples:[{kr:'한국에 가고 싶어요',rom:'hanguge gago sipeoyo',en:'I want to go to Korea'},{kr:'한국어를 배우고 싶어요',rom:'hangugeo-reul bae-ugo sipeoyo',en:'I want to learn Korean'}]},
+    {title:'Ability: -(으)ㄹ 수 있어요',desc:'Means "can" or "be able to". Use ㄹ 수 있어요 after vowels, 을 수 있어요 after consonants.',level:'intermediate',examples:[{kr:'한국어를 할 수 있어요',rom:'hangugeo-reul hal su isseoyo',en:'I can speak Korean'},{kr:'수영을 할 수 없어요',rom:'suyeong-eul hal su eopseoyo',en:'I can\'t swim'}]},
+    {title:'Conjunctions: -고 and -(으)면',desc:'-고 connects two actions (and/then). -(으)면 means "if/when".',level:'intermediate',examples:[{kr:'밥을 먹고 자요',rom:'bap-eul meokgo jayo',en:'I eat and then sleep'},{kr:'시간이 있으면 오세요',rom:'sigani isseumyeon oseyo',en:'If you have time, please come'}]},
+  ],
+  expert:[
+    {title:'Honorific speech system (경어법)',desc:'Korean has a complex honorific system. Key levels are formal polite (합쇼체), informal polite (해요체), and casual (해체). Word choice also changes: 먹다 → 드시다.',level:'expert',examples:[{kr:'진지 드셨어요?',rom:'jinji deusyeosseoyo?',en:'Have you eaten? (honorific)'},{kr:'성함이 어떻게 되세요?',rom:'seongham-i eotteoke doeseyo?',en:'May I ask your name?'}]},
+    {title:'Passive voice: -이/히/리/기다',desc:'Korean passives are formed by adding suffixes to verb stems. No agent is required.',level:'expert',examples:[{kr:'문이 열렸어요',rom:'mun-i yeollyeosseoyo',en:'The door opened (was opened)'},{kr:'편지가 쓰였어요',rom:'pyeonjiga sseulyeosseoyo',en:'The letter was written'}]},
+    {title:'Causative: -이/히/리/기/우/구/추다',desc:'Makes verbs causative (to make someone do something). Each verb has its own causative suffix.',level:'expert',examples:[{kr:'아이를 재워요',rom:'ai-reul jaewoyo',en:'I put the child to sleep'},{kr:'문을 열어요 vs 열려요',rom:'mun-eul yeoleo vs yeollyeoyo',en:'I open the door vs the door opens'}]},
+    {title:'Reported speech: -다고 하다',desc:'Used to report what someone said. Quotation markers change based on verb type.',level:'expert',examples:[{kr:'비가 온다고 했어요',rom:'biga ondago haesseoyo',en:'They said it would rain'},{kr:'맛있다고 해요',rom:'masitdago haeyo',en:'They say it\'s delicious'}]},
+    {title:'Connective endings: -는데/은데',desc:'Provides background info or contrast. Very frequently used in natural Korean speech.',level:'expert',examples:[{kr:'배가 고픈데 뭐 먹을까요?',rom:'bae-ga gopeuneunde mwo meogeulkkayo?',en:'I\'m hungry — what should we eat?'},{kr:'좋은데 비싸요',rom:'joeunde bissayo',en:'It\'s good but expensive'}]},
+  ],
+};
+
+let currentLevel='beginner';
+let currentDeck='Greetings';
+let cardIdx=0;
+let isFlipped=false;
+let quizWords=[],quizIdx=0,quizScore=0,quizAnswered=false;
+let chatHistory=[];
+
+function setLevel(l){
+  currentLevel=l;
+  document.querySelectorAll('.lvl-btn').forEach(b=>{
+    b.classList.remove('active');
+    if(b.classList.contains(l[0]))b.classList.add('active');
+  });
+  document.getElementById('level-label').textContent=l.charAt(0).toUpperCase()+l.slice(1);
+  document.getElementById('grammar-level-label').textContent=l.charAt(0).toUpperCase()+l.slice(1);
+  document.getElementById('quiz-lvl-label').textContent=l.charAt(0).toUpperCase()+l.slice(1);
+  rebuildDecks();
+  renderGrammar();
+  startQuiz();
+}
+
+function showTab(name){
+  ['hangul','vocab','grammar','quiz','chat'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active',['hangul','vocab','grammar','quiz','chat'][i]===name);
+  });
+  if(name==='quiz')startQuiz();
+}
+
+function renderHangul(){
+  renderGrid('con-grid',consonants,'Consonant');
+  renderGrid('dcon-grid',doubleConsonants,'Double Consonant');
+  renderGrid('vow-grid',vowels,'Vowel');
+  renderGrid('cvow-grid',compoundVowels,'Compound Vowel');
+}
+function renderGrid(id,data,type){
+  const g=document.getElementById(id);
+  data.forEach((c)=>{
+    const d=document.createElement('div');
+    d.className='char-card';
+    d.innerHTML=`<span class="kk">${c.k}</span><span class="rr">${c.r}</span><span class="nm">${c.name}</span>`;
+    d.onclick=()=>showCharDetail(c,type,d);
+    g.appendChild(d);
+  });
+}
+function showCharDetail(c,type,el){
+  document.querySelectorAll('.char-card').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('d-char').textContent=c.k;
+  document.getElementById('d-rom').textContent=c.r;
+  document.getElementById('d-tip').textContent=c.tip;
+  document.getElementById('d-type').textContent=type;
+  document.getElementById('d-ex').innerHTML=c.ex.map(e=>`<div class="ex-word"><span class="kr">${e.kr}</span><span class="en">${e.en}</span></div>`).join('');
+  const det=document.getElementById('char-detail');
+  det.classList.add('vis');
+  det.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function rebuildDecks(){
+  const ds=document.getElementById('deck-btns');
+  ds.innerHTML='';
+  const decks=allDecks[currentLevel];
+  const names=Object.keys(decks);
+  if(!decks[currentDeck])currentDeck=names[0];
+  names.forEach(name=>{
+    const b=document.createElement('button');
+    b.className='deck-btn'+(name===currentDeck?' active':'');
+    b.textContent=name;
+    b.onclick=()=>{
+      currentDeck=name;cardIdx=0;isFlipped=false;
+      document.getElementById('flashcard').classList.remove('flipped');
+      document.querySelectorAll('.deck-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      updateCard();
+    };
+    ds.appendChild(b);
+  });
+  cardIdx=0;
+  updateCard();
+}
+function updateCard(){
+  const cards=allDecks[currentLevel][currentDeck];
+  if(!cards||!cards.length)return;
+  const c=cards[cardIdx];
+  isFlipped=false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fc-kr').textContent=c.kr;
+  document.getElementById('fc-ro').textContent=c.r;
+  document.getElementById('fc-en').textContent=c.en;
+  document.getElementById('fc-ex').textContent=c.ex||'';
+  document.getElementById('fc-ctr').textContent=`${cardIdx+1} / ${cards.length}`;
+  document.getElementById('fc-prog').style.width=`${((cardIdx+1)/cards.length)*100}%`;
+}
+function flipCard(){isFlipped=!isFlipped;document.getElementById('flashcard').classList.toggle('flipped');}
+function nextCard(){const l=allDecks[currentLevel][currentDeck].length;cardIdx=(cardIdx+1)%l;updateCard();}
+function prevCard(){const l=allDecks[currentLevel][currentDeck].length;cardIdx=(cardIdx-1+l)%l;updateCard();}
+function markCard(){nextCard();}
+
+function renderGrammar(){
+  const g=document.getElementById('grammar-grid');
+  g.innerHTML='';
+  (grammarLessons[currentLevel]||[]).forEach(lesson=>{
+    const d=document.createElement('div');
+    d.className='g-card';
+    const bc=`badge-${lesson.level[0]}`;
+    const bl=lesson.level.charAt(0).toUpperCase()+lesson.level.slice(1);
+    const exHtml=lesson.examples.map(e=>`<div style="margin-bottom:10px"><div class="kr-ex">${e.kr}</div><div class="rom-ex">${e.rom}</div><div class="en-ex">${e.en}</div></div>`).join('');
+    d.innerHTML=`<h3>${lesson.title} <span class="badge ${bc}">${bl}</span></h3><p>${lesson.desc}</p><div class="example-box">${exHtml}</div>`;
+    d.onclick=()=>d.classList.toggle('open');
+    g.appendChild(d);
+  });
+}
+
+function getAllLevelWords(){
+  const words=[];
+  Object.values(allDecks[currentLevel]).forEach(deck=>deck.forEach(w=>words.push(w)));
+  return words;
+}
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+function startQuiz(){
+  quizWords=shuffle(getAllLevelWords()).slice(0,12);
+  quizIdx=0;quizScore=0;quizAnswered=false;
+  document.getElementById('quiz-result').style.display='none';
+  document.getElementById('quiz-game').style.display='block';
+  document.getElementById('qscore').textContent=0;
+  document.getElementById('qtotal').textContent=0;
+  loadQ();
+}
+function loadQ(){
+  quizAnswered=false;
+  const q=quizWords[quizIdx];
+  const toEn=Math.random()>0.4;
+  document.getElementById('q-type').textContent=toEn?'What does this mean in English?':'Which Korean word means...';
+  document.getElementById('q-word').textContent=toEn?q.kr:q.en;
+  document.getElementById('q-sub').textContent=toEn?q.r:'';
+  document.getElementById('q-fb').textContent='';
+  document.getElementById('btn-next').disabled=true;
+  document.getElementById('pfill').style.width=`${(quizIdx/quizWords.length)*100}%`;
+  const allW=getAllLevelWords();
+  let opts=[q];
+  shuffle(allW.filter(x=>x.en!==q.en)).slice(0,3).forEach(x=>opts.push(x));
+  opts=shuffle(opts);
+  const od=document.getElementById('quiz-opts');
+  od.innerHTML='';
+  opts.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='qopt';
+    b.textContent=toEn?opt.en:opt.kr;
+    b.onclick=()=>checkQ(b,toEn?opt.en:opt.kr,toEn?q.en:q.kr);
+    od.appendChild(b);
+  });
+}
+function checkQ(btn,chosen,correct){
+  if(quizAnswered)return;
+  quizAnswered=true;
+  const ok=chosen===correct;
+  document.querySelectorAll('.qopt').forEach(b=>{b.disabled=true;if(b.textContent===correct)b.classList.add('correct');});
+  const fb=document.getElementById('q-fb');
+  if(!ok){btn.classList.add('wrong');fb.innerHTML=`<span class="fb-no">Not quite! Answer: <strong>${correct}</strong></span>`;}
+  else{quizScore++;fb.innerHTML=`<span class="fb-ok">정답! Correct! 🎉</span>`;}
+  document.getElementById('qscore').textContent=quizScore;
+  document.getElementById('qtotal').textContent=quizIdx+1;
+  document.getElementById('btn-next').disabled=false;
+}
+function nextQ(){
+  quizIdx++;
+  if(quizIdx>=quizWords.length){showResult();return;}
+  loadQ();
+}
+function showResult(){
+  document.getElementById('quiz-game').style.display='none';
+  document.getElementById('quiz-result').style.display='block';
+  const pct=Math.round((quizScore/quizWords.length)*100);
+  document.getElementById('res-score').textContent=`${quizScore} / ${quizWords.length}  (${pct}%)`;
+  let e='😊',m='Keep going — practice makes perfect!';
+  if(pct>=90){e='🏆';m='Outstanding! 한국어 짱이에요!';}
+  else if(pct>=70){e='🎉';m='Great work! You\'re getting there!';}
+  else if(pct>=50){e='💪';m='Good effort! Review the flashcards and try again.';}
+  document.getElementById('res-emoji').textContent=e;
+  document.getElementById('res-msg').textContent=m;
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-inp');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';
+  addMsg('user',txt);
+  chatHistory.push({role:'user',content:txt});
+  document.getElementById('chat-send').disabled=true;
+  addMsg('bot','...typing',true);
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`You are a warm, encouraging Korean language tutor. The user is a ${currentLevel}-level learner.
+- Tailor explanations to their level
+- Always include Korean text (한글) with romanization in parentheses
+- Format vocabulary as: 한국어 (romanization) = English meaning
+- Keep responses concise (3-6 lines unless listing vocabulary)
+- Be encouraging and add a fun cultural note when relevant
+- If the user writes Korean, praise them first, then gently correct if needed`,
+        messages:chatHistory
+      })
+    });
+    const data=await r.json();
+    const reply=data.content?.[0]?.text||'Sorry, I could not respond. Please try again.';
+    removeTyping();
+    addMsg('bot',reply);
+    chatHistory.push({role:'assistant',content:reply});
+  }catch(e){removeTyping();addMsg('bot','Connection error. Please try again!');}
+  document.getElementById('chat-send').disabled=false;
+  inp.focus();
+}
+function sendQ(text){document.getElementById('chat-inp').value=text;sendChat();}
+function addMsg(type,text,typing=false){
+  const d=document.createElement('div');
+  d.className='msg '+type+(typing?' typing':'');
+  if(typing)d.id='typing-msg';
+  d.textContent=text;
+  const m=document.getElementById('chat-msgs');
+  m.appendChild(d);
+  m.scrollTop=m.scrollHeight;
+}
+function removeTyping(){const e=document.getElementById('typing-msg');if(e)e.remove();}
+
+renderHangul();
+rebuildDecks();
+renderGrammar();
+startQuiz();
+</script>
+</body>
+</html>
